@@ -51,10 +51,7 @@ class UserAgentParser(object):
         match = self.user_agent_re.search(user_agent_string)
         if match:
             if self.family_replacement:
-                if re.search(r'\$1', self.family_replacement):
-                    family = re.sub(r'\$1', match.group(1), self.family_replacement)
-                else:
-                    family = self.family_replacement
+                family =  re.sub(r'\$1', match.group(1), self.family_replacement) if re.search(r'\$1', self.family_replacement) else self.family_replacement
             else:
                 family = match.group(1)
 
@@ -321,26 +318,20 @@ def ParseDevice(user_agent_string):
 def PrettyUserAgent(family, v1=None, v2=None, v3=None):
     """Pretty user agent string."""
     if v3:
-        if v3[0].isdigit():
-            return '%s %s.%s.%s' % (family, v1, v2, v3)
-        else:
-            return '%s %s.%s%s' % (family, v1, v2, v3)
+        return f'{family} {v1}.{v2}.{v3}' if v3[0].isdigit() else f'{family} {v1}.{v2}{v3}'
     elif v2:
-        return '%s %s.%s' % (family, v1, v2)
+        return f'{family} {v1}.{v2}'
     elif v1:
-        return '%s %s' % (family, v1)
+        return f'{family} {v1}'
     return family
 
 
 def PrettyOS(os, os_v1=None, os_v2=None, os_v3=None, os_v4=None):
     """Pretty os string."""
     if os_v4:
-        return '%s %s.%s.%s.%s' % (os, os_v1, os_v2, os_v3, os_v4)
+        return f'{os} {os_v1}.{os_v2}.{os_v3}.{os_v4}'
     if os_v3:
-        if os_v3[0].isdigit():
-            return '%s %s.%s.%s' % (os, os_v1, os_v2, os_v3)
-        else:
-            return '%s %s.%s%s' % (os, os_v1, os_v2, os_v3)
+        return f'{os} {os_v1}.{os_v2}.{os_v3}' if os_v3[0].isdigit() else f'{os} {os_v1}.{os_v2}{os_v3}'
     elif os_v2:
         return '%s %s.%s' % (os, os_v1, os_v2)
     elif os_v1:
@@ -379,7 +370,7 @@ def ParseWithJSOverrides(user_agent_string,
         js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
         user_agent_string.find('chromeframe') > -1
     ):
-        family = 'Chrome Frame (%s %s)' % (family, v1)
+        family = f'Chrome Frame ({family} {v1})'
         ua_dict = ParseUserAgent(js_user_agent_string)
         v1 = ua_dict['major']
         v2 = ua_dict['minor']
@@ -391,10 +382,7 @@ def ParseWithJSOverrides(user_agent_string,
 def Pretty(family, v1=None, v2=None, v3=None):
     """ backwards compatible. use PrettyUserAgent instead! """
     if v3:
-        if v3[0].isdigit():
-            return '%s %s.%s.%s' % (family, v1, v2, v3)
-        else:
-            return '%s %s.%s%s' % (family, v1, v2, v3)
+        return f'{family} {v1}.{v2}.{v3}' if v3[0].isdigit() else f'{family} {v1}.{v2}{v3}'
     elif v2:
         return '%s %s.%s' % (family, v1, v2)
     elif v1:
